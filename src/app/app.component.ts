@@ -7,10 +7,22 @@ import { LoginComponent } from './login/login.component';
 import { HttpClientModule } from '@angular/common/http';
 import { RegisterComponent } from './register/register.component';
 import { WelcomeComponent } from './welcome/welcome.component';
+import { CartComponent } from './cart/cart.component'; 
+
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet,WelcomeComponent,CatalogComponent, FormsModule, CommonModule,LoginComponent,HttpClientModule,RegisterComponent],
+  imports: [
+    CartComponent,
+    RouterOutlet,
+    WelcomeComponent,
+    CatalogComponent, 
+    FormsModule, 
+    CommonModule,
+    LoginComponent,
+    HttpClientModule,
+    RegisterComponent
+  ],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css'
 

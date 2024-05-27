@@ -10,7 +10,9 @@ export class Product {
   _alertMessage?: string;
   category: string;
   
+  onPromotion?: boolean; // Nouvelle propriété pour indiquer la promotion
 
+  
   constructor(id: string, name: string, description: string, quantity: number, price: number, img: string, category: string) {
     this.id = id;
     this.name = name;

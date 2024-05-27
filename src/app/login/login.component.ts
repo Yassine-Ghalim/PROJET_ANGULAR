@@ -3,18 +3,20 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '../auth.service';
 import { AppUser } from '../model/user.model';
-import { ReactiveFormsModule } from '@angular/forms'; // Importez ReactiveFormsModule
+import { ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
+
 @Component({
   selector: 'app-login',
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.css'],
-  standalone:true,
-  imports: [ReactiveFormsModule,CommonModule]
+  standalone: true,
+  imports: [ReactiveFormsModule, CommonModule]
 })
 export class LoginComponent implements OnInit {
   loginForm!: FormGroup;
   errorMessage: string = '';
+  userActuel: AppUser | undefined;
 
   constructor(
     private formBuilder: FormBuilder,
@@ -36,30 +38,31 @@ export class LoginComponent implements OnInit {
     }
 
     const formValue = this.loginForm.value;
-    const username = formValue.username; // Utilisez formValue pour accéder aux valeurs du formulaire
+    const username = formValue.username;
     const password = formValue.password;
 
     this.authService.login(username, password).subscribe(
       (success) => {
         if (success) {
-          const roles = [];
-          if (username === 'ghalimyassine3@gmail.com') {
-            roles.push('ADMIN');
-          } else {
-            roles.push('USER');
-          }
-    
+          const roles = username === 'ghalimyassine3@gmail.com' ? ['ADMIN'] : ['USER'];
+
           const authenticatedUser: AppUser = {
-            id: 1, // ID simulé, assurez-vous de l'obtenir correctement
+            id: 1, // Simulated ID, make sure to obtain this correctly
             email: username,
-            password: '', // Ne stockez jamais le mot de passe en clair
-            roles: roles, // Utiliser les rôles définis
-            username: ''
+            password: '', // Never store the password in plain text
+            roles: roles,
+            username: '' // Adjust this if you have a username field in AppUser
           };
 
           this.authService.authenticatuser(authenticatedUser).subscribe(() => {
-            this.router.navigate(['/catalog/Accueil']);
+            this.authService.getUserByEmail(username).subscribe(
+              (u: AppUser) => {
+                const serializedUser = JSON.stringify(u);
+                this.router.navigate(['/catalog/product'], { queryParams: { user: serializedUser } });
+              }
+            );
           });
+          
         } else {
           this.errorMessage = 'Identifiants incorrects. Veuillez réessayer.';
         }
@@ -70,6 +73,4 @@ export class LoginComponent implements OnInit {
       }
     );
   }
- 
-
 }

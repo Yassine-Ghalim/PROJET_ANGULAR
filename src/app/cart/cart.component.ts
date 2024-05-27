@@ -1,43 +1,124 @@
-import { Component } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
-import { Product } from '../Product';
+import { Component, OnInit } from '@angular/core';
 import { ProductService } from '../product.service';
-import { Router } from '@angular/router';
+import { UserService } from '../user.service';
+import { Cart } from '../cart';
+import { Product } from '../Product';
 import { CommonModule } from '@angular/common';
-
-
 
 @Component({
   selector: 'app-cart',
+  standalone: true,
+  imports: [CommonModule],
   templateUrl: './cart.component.html',
-  styleUrls: ['./cart.component.css'],
-  standalone:true,
-  imports : [CommonModule]
-
+  styleUrls: ['./cart.component.css']
 })
-export class CartComponent {
-  
-  selectedProducts: Product[] = [];
+export class CartComponent implements OnInit {
+  carts: Cart[] = [];
+  groupedCarts: Cart[] = [];
+  userEmail: string | null = null;
+  quantityToAdd: number = 1;
 
-  constructor(private productService: ProductService) {}
+  constructor(
+    private productService: ProductService,
+    private userService: UserService
+  ) {}
 
   ngOnInit(): void {
-    this.productService.getSelectedProducts().subscribe(items=>(
-      this.selectedProducts=items
-    ));
+    this.userEmail = this.userService.getUserEmail();
+    if (this.userEmail) {
+      this.getCartsForCurrentUser();
+    } else {
+      console.error('User email not available in CartComponent');
+    }
   }
-// Dans le composant Cart
-removeFromCart(product: Product): void {
-  this.productService.removeFromCart(product); // Assurez-vous que product est bien une instance de Product
-}
 
-increaseQuantity(product: Product): void {
-  this.productService.increaseQuantity(product); // Appeler la méthode d'augmentation de quantité du service
-}
+  addToCart(product: Product): void {
+    if (!this.userEmail) {
+      console.error('User email not available.');
+      return;
+    }
 
-decreaseQuantity(product: Product): void {
-  this.productService.decreaseQuantity(product); // Appeler la méthode de décrémentation de quantité du service
-}
+    const cartItemId = this.productService.generateCartItemId();
 
-}
+    this.productService.addToCart(
+      this.userEmail,
+      cartItemId,
+      product.name,
+      product.price,
+      product.img,
+      this.quantityToAdd
+    ).subscribe(success => {
+      if (success) {
+        console.log('Product added to cart successfully.');
+        this.getCartsForCurrentUser();
+      } else {
+        console.error('Error adding product to cart.');
+      }
+    });
+  }
 
+  getCartsForCurrentUser(): void {
+    if (this.userEmail) {
+      this.productService.getCartsByEmail(this.userEmail).subscribe(carts => {
+        this.carts = carts;
+        this.groupedCarts = this.groupCartItems(carts);
+      }, error => {
+        console.error('Error getting carts:', error);
+      });
+    }
+  }
+
+  groupCartItems(carts: Cart[]): Cart[] {
+    const cartMap = new Map<string, Cart>();
+    carts.forEach(cartItem => {
+      if (cartMap.has(cartItem.productId)) {
+        cartMap.get(cartItem.productId)!.quantity += cartItem.quantity;
+      } else {
+        cartMap.set(cartItem.productId, { ...cartItem });
+      }
+    });
+    return Array.from(cartMap.values());
+  }
+
+  findCartItemByProductId(productId: string): Cart | undefined {
+    return this.carts.find(cartItem => cartItem.productId === productId);
+  }
+
+  updateCart(cartItem: Cart): void {
+    this.productService.updateCartQuantity(cartItem.id, cartItem.quantity).subscribe(
+      () => {
+        console.log('Cart item quantity updated successfully.');
+        this.getCartsForCurrentUser();
+      },
+      error => {
+        console.error('Error updating cart item quantity:', error);
+      }
+    );
+  }
+
+  removeFromCart(cartItemId: string): void {
+    if (!cartItemId) {
+      console.error('Cart item ID is not available.');
+      return;
+    }
+
+    this.productService.removeFromCart(cartItemId).subscribe(
+      () => {
+        console.log('Cart item removed successfully.');
+        this.getCartsForCurrentUser();
+      },
+      error => {
+        console.error('Error removing cart item:', error);
+      }
+    );
+  }
+
+
+  calculateTotalPrice(): number {
+    let totalPrice = 0;
+    this.groupedCarts.forEach(cartItem => {
+      totalPrice += cartItem.price * cartItem.quantity;
+    });
+    return totalPrice;
+  }
+}

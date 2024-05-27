@@ -11,14 +11,7 @@
 .main-content {
   padding-top: 70px; /* Ajustez la valeur selon la hauteur de votre navbar */
 }
-.btn-logout {
-  background-color: #4a4b52;
-  color: white;
-  border: none;
-  padding: 8px;
-  border-radius: 4px;
-  cursor: pointer;
-}
+
 
 .btn-logout i {
   margin-left: 5px;
@@ -63,7 +56,7 @@ div {
   font-family: Arial, sans-serif;
   font-size: 16px;
   color: #333; /* Couleur du texte */
-  line-height: 1.5; /* Hauteur de ligne */
+  line-height: 1.5; /* Hauteur de ligne */  
 }
 /*µ*****************************/
 body {
@@ -91,28 +84,8 @@ body {
 }
 
 /* *************** */
-.btn-gradient {
-  background-color: transparent;
-  background-image: linear-gradient(to bottom, #77fff4, #367ccc);
-  border-color: #000000;
-  color: #ffffff;
-  transition: background-color 0.3s ease-in-out, color 0.3s ease-in-out;
-}
 
-.btn-gradient:hover,
-.btn-gradient:focus {
-  color: #070606;
 
-}
-
-.btn-gradient:active {
-  
-  border-color: #000000;
-}
-
-.btn-gradient i {
-  margin-right: 8px;
-}
 
 #largeImageContainer {
   position: fixed;
@@ -158,5 +131,5 @@ body {
     }
 
     .navbar {
-      background: linear-gradient(to right, #5ccae680, rgb(24, 7, 99));
+      background: linear-gradient(to right, #072a6b, #349bca);
   }

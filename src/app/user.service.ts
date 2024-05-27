@@ -34,4 +34,21 @@ export class UserService {
     );
   }
   
+  private userEmailKey = 'userEmail'; // Clé pour stocker l'email dans localStorage
+
+  setUserEmail(email: string | null): void {
+    if (email) {
+      localStorage.setItem(this.userEmailKey, email);
+    } else {
+      localStorage.removeItem(this.userEmailKey);
+    }
+  }
+  
+  getUserEmail(): string | null {
+    return localStorage.getItem(this.userEmailKey);
+  }
+  
+  clearUserEmail(): void {
+    localStorage.removeItem(this.userEmailKey);
+  }
 }

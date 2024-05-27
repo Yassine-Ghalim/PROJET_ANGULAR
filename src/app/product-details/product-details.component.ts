@@ -4,6 +4,7 @@ import { CommonModule } from '@angular/common';
 import { ProductService } from '../product.service';
 import { AuthService } from '../auth.service';
 import { Route, Router } from '@angular/router';
+import { Cart } from '../cart';
 
 @Component({
   selector: 'app-product-details',
@@ -37,14 +38,13 @@ export class ProductDetailsComponent {
    
   }
   
-  purchase2() {
+  purchase2(product:Product) {
     
-    return this.ach.emit(this.product);
+    return this.ach.emit(product);
+    
     }
 
-      addToCart(product:Product){
-        return this.c.emit(product);
-      }
+  
 
     showDetails: boolean = false;
 
@@ -70,7 +70,22 @@ export class ProductDetailsComponent {
       this.searchAction.emit();
     }
 
+    showSuccessMessage = false;
 
-
+    showSuccess(): void {
+      this.showSuccessMessage = true;
+      setTimeout(() => {
+        this.showSuccessMessage = false;
+      }, 3000); // Afficher le message pendant 3 secondes
+    }
     
+
+    togglePromotion(): void {
+      if (this.product) {
+        const newPromotionState = !this.product.onPromotion;
+        this.ps.updateProductPromotion(this.product.id, newPromotionState).subscribe(updatedProduct => {
+          this.product.onPromotion = newPromotionState; // Seulement mettre à jour l'état de promotion
+        });
+      }
+    }
 }

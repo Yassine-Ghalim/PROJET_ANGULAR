@@ -3,11 +3,11 @@ import { ProductService } from '../product.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Product } from '../Product';
 import { FormsModule } from '@angular/forms';
-
+import { CommonModule } from '@angular/common';
 @Component({
   selector: 'app-edit',
   standalone: true,
-  imports: [FormsModule],
+  imports: [FormsModule,CommonModule],
   templateUrl: './edit.component.html',
   styleUrl: './edit.component.css'
 })
@@ -53,4 +53,29 @@ export class EditComponent {
       }
     });
   }
+
+
+  imagePreview: string | ArrayBuffer | null = null;
+
+// Méthode pour gérer le téléchargement de l'image
+onImageUpload(event: Event): void {
+  const file = (event.target as HTMLInputElement).files?.[0];
+  if (file) {
+    // Obtenez le nom de fichier de l'image
+    const fileName = file.name;
+    console.log('File Name:', fileName);
+
+    // Mettez à jour le champ img du produit avec le chemin relatif vers assets
+    this.product.img = `assets/images/${fileName}`;
+
+    // Facultatif : affichez l'aperçu de l'image
+    const reader = new FileReader();
+    reader.onload = () => {
+      this.imagePreview = reader.result as string;
+    };
+    reader.readAsDataURL(file);
+  } else {
+    console.error('No image selected!');
+  }
+}
 }

@@ -1,23 +1,38 @@
-<!-- cart.component.html -->
+<div class="container">
+  <h2>Your Cart</h2>
+  <div class="total-price" style="color: aliceblue; background-color: rgb(9, 97, 43);">
+    Total Price: {{ calculateTotalPrice() | currency:'USD':'symbol':'1.2-2' }}
+  </div>
+  
+  <div *ngIf="groupedCarts && groupedCarts.length > 0" class="table-responsive">
+    <table class="table table-bordered">
+      <thead>
+        <tr>
+          <th>Image</th>
+          <th>Product Name</th>
+          <th>Price</th>
+          <th>Quantity</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let cartItem of groupedCarts">
+          <td><img [src]="cartItem.image" alt="{{ cartItem.productName }}" class="img-thumbnail" width="100" height="100" /></td>
+          <td>{{ cartItem.productName }}</td>
+          <td>{{ cartItem.price }}$</td>
+          <td style="color: darkgreen;">{{ cartItem.quantity }}
 
-<div style="margin-top: 60px">
-  <div>
-    <div class="product-container row">
-      <div class="col-md-4" *ngFor="let product of selectedProducts">
-        <div class="product-item white-background">
-          <img [src]="product.img" alt="{{ product.name }}" class="img-fluid rounded-start" style="max-width: 200px; max-height: 100px;" />
-          <h4>{{ product.name }}</h4>
-          <p>{{ product.price }}€</p>
-          <div>
-            <!-- Afficher la quantité et les boutons +/- -->
-            <div class="quantity-control">
-              <button type="button" (click)="decreaseQuantity(product)" class="btn btn-outline-secondary"><i class="bi bi-dash"></i></button>
-              <span>{{ product.quantity }}</span>
-              <button type="button" (click)="increaseQuantity(product)" class="btn btn-outline-secondary"><i class="bi bi-plus"></i></button>
-            </div>
-          </div>
-        </div>  
-      </div>
-    </div>
+          
+          </td>
+          <td>
+            <button (click)="removeFromCart(cartItem.id)" class="btn btn-danger">Remove</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  
+  <div *ngIf="!groupedCarts || groupedCarts.length === 0">
+    <p class="text-info">Your cart is empty.</p>
   </div>
 </div>

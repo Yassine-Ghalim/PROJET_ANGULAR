@@ -2,11 +2,10 @@ import { Injectable, OnInit } from '@angular/core';
 import { Product } from './Product';
 import { Router } from '@angular/router';
 import { BehaviorSubject, catchError, map, Observable, of,Subject, switchMap, throwError } from 'rxjs';
-import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
 import { Cart } from './cart';
 import { AuthService } from './auth.service';
-
-
+import { v4 as uuidv4Alias } from 'uuid'; 
 
 @Injectable({
   providedIn: 'root'
@@ -21,7 +20,7 @@ export class ProductService {
   
 
 
-  constructor( private router : Router,private http : HttpClient,auth:AuthService) {
+  constructor( private router : Router,private http : HttpClient, private auth :AuthService) {
    }
  
   
@@ -39,73 +38,44 @@ export class ProductService {
     return quantity < 5;
   }
  
-  // Dans le service ProductService
-purchase3(product: Product): void {
-  if (product.quantity > 0) {
-    product.quantity--; // Décrémenter la quantité
-    if (product.quantity < 5) {
-      product._alertMessage = `⚠︎ Quantité restante inférieure à 5 !`;
-    }
-  } else {
-    product._alertMessage = `Produit épuisé !`;
-  }
-}
-private cartsUrl = 'http://localhost:3000/carts'; // URL de votre backend (par exemple, une API REST)
-
-
-getCarts(): Observable<Cart[]> {
-  return this.http.get<Cart[]>(this.cartsUrl);
-}
-addToCart(product: Product, userId: number): Observable<boolean> {
-  const cartItem: Cart = {
-    productId: product.id,
-    userId: userId,
-    quantity: 1
-  };
+  purchase3(product: Product): void {
+    if (product.quantity > 0) {
+      // Décrémenter la quantité
+      --product.quantity;
   
-  return this.http.post<any>(this.cartsUrl, cartItem).pipe(
-    map(() => true), // Retourner true si l'ajout est réussi
-    catchError(() => {
-      console.error('Error adding cart item');
-      return throwError(false); // Retourner false en cas d'erreur lors de l'ajout
-    })
-  );
+      // Mettre à jour la quantité dans la base de données
+      this.updateProductQuantity(product.id, product.quantity).subscribe(
+        updatedProduct => {
+          console.log('Product quantity updated successfully in the database.');
+          if (updatedProduct.quantity < 5) {
+            updatedProduct._alertMessage = `⚠︎ Quantité restante inférieure à 5 !`;
+          }
+        },
+        error => {
+          console.error('Error updating product quantity:', error);
+          // Afficher un message d'erreur ou gérer l'erreur d'une autre manière
+        }
+      );
+    } else {
+      product._alertMessage = `Produit épuisé !`;
+    }
+  }
+  
+  
+updateProductQuantity(productId: string, newQuantity: number): Observable<Product> {
+  return this.http.patch<Product>(`${this.apiUrl}/${productId}`, { quantity: newQuantity });
 }
-//   const currentItems = this.cartItemsSubject.getValue(); // Obtenir les produits actuels du panier
-//   const existingProduct = currentItems.find(item => item.id === product.id); // Rechercher le produit dans le panier
 
-//   if (existingProduct) {
-//     existingProduct.quantity++; // Augmenter la quantité si le produit existe déjà dans le panier
-//   } else {
-//     currentItems.push(product); // Ajouter le produit au panier s'il n'existe pas déjà
-//   }
 
-//   this.cartItemsSubject.next(currentItems); // Mettre à jour le BehaviorSubject avec les produits du panier
-// }
 
   getSelectedProducts(): Observable<Product[]> {
     return this.cartItemsSubject.asObservable();
   }
+/*************************** */
+private cartsUrl = 'http://localhost:3000/carts'; // URL de votre backend (par exemple, une API REST)
 
   
-
-// Dans le service ProductService
-removeFromCart(product: Product): void {
-  const currentItems = this.cartItemsSubject.getValue(); // Obtenir les produits actuels du panier
-  const updatedItems = currentItems.filter(item => item.id !== product.id); // Filtrer les produits pour exclure celui à supprimer
-
-  this.cartItemsSubject.next(updatedItems); // Mettre à jour le BehaviorSubject avec les nouveaux produits du panier
-}
-increaseQuantity(product: Product): void {
-  product.quantity++; // Incrémente la quantité du produit
-}
-
-decreaseQuantity(product: Product): void {
-  if (product.quantity > 1) {
-    product.quantity--; // Décrémente la quantité si elle est supérieure à 1
-  }
-}
-
+/**************************************** */
   //get
   getAll(page: number=1,size: number=8) {
     return this.http.get<Product[]>(`${this.apiUrl}?_page=${page}&_limit=${size}`);
@@ -118,6 +88,7 @@ decreaseQuantity(product: Product): void {
   create(product: Product): Observable<any> {
     return this.http.post<Product>(`${this.apiUrl}`, product);
   }
+  
 
   private addedProductsSubject: BehaviorSubject<Product[]> = new BehaviorSubject<Product[]>([]);
   addedProducts$ = this.addedProductsSubject.asObservable();
@@ -143,14 +114,63 @@ decreaseQuantity(product: Product): void {
     return this.http.get<Product[]>(url);
   }
 
-
   
+
+  getCarts(): Observable<Cart[]> {
+    return this.http.get<Cart[]>(this.cartsUrl);
+  }
+  addToCart(email: string, productId: string, productName: string, price: number, image: string, quantity: number): Observable<boolean> {
+    const cartItem: Cart = {
+      id: uuidv4Alias(),  // Generate a unique ID for the new cart item
+      email,
+      productId,
+      quantity,
+      productName,
+      price,
+      image,
+    };
+
+    return this.http.post<any>(this.cartsUrl, cartItem).pipe(
+      map(() => true),
+      catchError(error => {
+        console.error('Error adding cart item:', error);
+        return throwError(() => new Error('Error adding cart item'));
+      })
+    );
+  }
+
+  generateCartItemId(): string {
+    return uuidv4Alias();
   }
   
+  updateCartQuantity(cartItemId: string, newQuantity: number): Observable<Cart> {
+    return this.http.patch<Cart>(`${this.cartsUrl}/${cartItemId}`, { quantity: newQuantity });
+  }
+
+  getCartsByEmail(email: string): Observable<Cart[]> {
+    return this.http.get<Cart[]>(`${this.cartsUrl}?email=${email}`);
+  }
 
 
 
 
 
+  updateProductPromotion(productId: string, onPromotion: boolean): Observable<Product> {
+    return this.http.patch<Product>(`${this.apiUrl}/${productId}`, { onPromotion });
+  }
+
+  removeFromCart(cartItemId: string): Observable<void> {
+    const url = `${this.cartsUrl}/${cartItemId}`;
+    console.log(`Removing cart item with URL: ${url}`); // Debug log
+
+    return this.http.delete<void>(url).pipe(
+      catchError(error => {
+        console.error('Error removing cart item:', error);
+        return throwError(() => new Error('Error removing cart item'));
+      })
+    );
+  }
+  }
+  
 
 

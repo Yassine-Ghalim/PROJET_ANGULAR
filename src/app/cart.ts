@@ -1,5 +1,9 @@
 export interface Cart {
-    productId: string;
-    userId: number;
-    quantity: number;
-  }
+  id: string; // Ajouter la propriété pour l'ID du panier
+  email: string;
+  productId: string;
+  quantity: number;
+  productName: string;
+  price: number;
+  image: string;
+}
