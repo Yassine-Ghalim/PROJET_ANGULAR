@@ -64,13 +64,16 @@ export class LoginComponent implements OnInit {
           });
           
         } else {
-          this.errorMessage = 'Identifiants incorrects. Veuillez réessayer.';
+          this.errorMessage = 'Incorrect credentials. Please try again';
         }
       },
       (error) => {
         console.error('Error during login:', error);
-        this.errorMessage = 'Une erreur est survenue lors de la connexion. Veuillez réessayer.';
+        this.errorMessage = 'An error occurred during the connection. Please try again.';
       }
     );
+  }
+  goToRegister() {
+    this.router.navigate(['/register']); // Rediriger vers la composante d'inscription
   }
 }

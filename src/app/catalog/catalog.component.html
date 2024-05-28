@@ -4,7 +4,7 @@
     
     
     <a class="navbar-brand d-inline-flex align-items-center justify-content-center rounded-circle" routerLink="/catalog/Accueil" style="width: 40px; height: 40px; background: linear-gradient(to right, #3498db, #1abc9c); color: #fff; font-size: 18px; text-decoration: none; border-radius: 50%; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);">
-      <span style="font-weight: bold;">MonSite</span>
+      <span style="font-weight: bold;">MyWS</span>
     </a>
     
     
@@ -18,20 +18,20 @@
         <div class="col">
           <ul class="navbar-nav me-auto mb-2 mb-lg-0">
             <li class="nav-item active">
-              <a class="nav-link custom-link" aria-current="page" routerLink="/catalog/Accueil">Accueil</a>
+              <a class="nav-link custom-link" aria-current="page" routerLink="/catalog/Accueil" i18n>Home</a>
             </li>
             <li class="nav-item active">
-              <a class="nav-link custom-link" routerLink="/catalog/product">Products</a>
+              <a class="nav-link custom-link" routerLink="/catalog/product" i18n>Products</a>
             </li>
              <!-- Dropdown -->
              <li class="nav-item dropdown">
-              <a class="nav-link dropdown-toggle custom-link" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                Catégories de Produits
+              <a class="nav-link dropdown-toggle custom-link" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false"i18n>
+                Product Categories
               </a>
               <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-                <li><a class="dropdown-item" [routerLink]="['/catalog/categorie', 'tablet']">Tablette</a></li>
-                <li><a class="dropdown-item" [routerLink]="['/catalog/categorie', 'phone']">Téléphone</a></li>
-                <li><a class="dropdown-item" [routerLink]="['/catalog/categorie', 'pc']">PC</a></li>
+                <li><a class="dropdown-item" [routerLink]="['/catalog/categorie', 'tablet']" i18n>Tablets</a></li>
+                <li><a class="dropdown-item" [routerLink]="['/catalog/categorie', 'phone']" i18n>Phones</a></li>
+                <li><a class="dropdown-item" [routerLink]="['/catalog/categorie', 'pc']" i18n>Computers</a></li>
               </ul>
             </li>
         
@@ -69,7 +69,7 @@
             </li>
             <li>
               <button class="btn btn-light" (click)="logout()">
-                  <i class="bi bi-box-arrow-right ">   Logout</i>
+                  <i class="bi bi-box-arrow-right " i18n>   Logout</i>
               </button>
           </li>          
           </ul>
@@ -85,8 +85,8 @@
 <!-- Pied de page -->
 <footer class="bg-black text-white p-3">
   <div class="container">
-    <p class="text-center ">Contact us for more information</p>
+    <p class="text-center " style="color: white;" i18n>Contact us for more information</p>
     <p class="text-center "><a href="mailto:ghalimyassine3@gmail.com">ghalimyassine3&#64;gmail.com</a></p>
-    <p class="text-center ">Phone: 0635185425</p>
+    <p class="text-center " style="color: white;" i18n>Phone: 0635185425</p>
   </div>
 </footer>

@@ -81,7 +81,7 @@ export class AuthService {
   }
   getUserByEmail(email:string):Observable<AppUser>{
     const url = `${this.usersUrl}?email=${email}`;
-    alert(url);
+    
     return this.http.get<AppUser>(url);
   }
   getCurrentUserId(): number | undefined {

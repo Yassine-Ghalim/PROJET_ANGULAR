@@ -3,10 +3,11 @@ import { CommonModule } from '@angular/common';
 import { Product } from '../Product';
 import { ProductService } from '../product.service';
 import { ActivatedRoute, Router } from '@angular/router';
-import { AppUser } from '../model/user.model';
-import { ProductDetailsComponent } from "../product-details/product-details.component";
+import { ProductDetailsComponent } from '../product-details/product-details.component';
 import { AuthService } from '../auth.service';
 import { UserService } from '../user.service';
+import { AppUser } from '../model/user.model';
+import { Cart } from '../cart';
 
 @Component({
     selector: 'app-categorie',
@@ -31,17 +32,22 @@ export class CategorieComponent implements OnInit {
   category!: string;
   
   filteredProducts: Product[] = [];
-
+  
   constructor(
     private ps: ProductService,
     private router: Router,
     private auth: AuthService,
     private route: ActivatedRoute,
     private userService: UserService
-  ) { }
-
+  ) {}
 
   ngOnInit(): void {
+
+    this.route.params.subscribe(params => {
+      this.category = params['category'];
+      this.filterByCategory(this.category);
+    });
+
     this.email = this.userService.getUserEmail();
     if (this.email) {
       console.log("User email retrieved from localStorage:", this.email);
@@ -95,6 +101,14 @@ export class CategorieComponent implements OnInit {
     }
   }
   
+  filterByCategory(category: string): void {
+    this.ps.getProductsByCategory(category).subscribe(products => {
+      this.products = products;
+      this.filteredProducts = [...this.products];
+    });
+  }
+
+  showDetails: boolean = false;
   
   
   addToCart(product: Product): void {
@@ -150,14 +164,14 @@ showSuccessMessage = false;
 
   getProduct() {
     this.ps.getAll().subscribe(data => {
-      this.filteredProducts = data;
+      this.myArray = data;
       this.originalProducts = data;
     });
   }
 
   deleteProduct(id: string) {
     this.ps.delete(id).subscribe(() => {
-      this.filteredProducts = this.filteredProducts.filter((product: { id: string; }) => product.id != id);
+      this.myArray = this.myArray.filter((product: { id: string; }) => product.id != id);
     });
   }
 
@@ -176,11 +190,11 @@ showSuccessMessage = false;
 
   performSearch(): void {
     if (this.searchKeyword.trim() !== '') {
-      this.filteredProducts = this.filteredProducts.filter((product: { name: string; }) =>
+      this.myArray = this.myArray.filter((product: { name: string; }) =>
         product.name.toLowerCase().includes(this.searchKeyword.toLowerCase())
       );
     } else {
-      this.filteredProducts = this.originalProducts;
+      this.myArray = this.originalProducts;
     }
   }
 }

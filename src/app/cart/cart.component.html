@@ -1,6 +1,6 @@
 <div class="container">
   <h2>Your Cart</h2>
-  <div class="total-price" style="color: aliceblue; background-color: rgb(9, 97, 43);">
+  <div class="total-price" style="color: aliceblue; background-color: rgb(9, 97, 43);" i18n>
     Total Price: {{ calculateTotalPrice() | currency:'USD':'symbol':'1.2-2' }}
   </div>
   
@@ -8,11 +8,11 @@
     <table class="table table-bordered">
       <thead>
         <tr>
-          <th>Image</th>
-          <th>Product Name</th>
-          <th>Price</th>
-          <th>Quantity</th>
-          <th>Action</th>
+          <th i18n>Image</th>
+          <th i18n>Product Name</th>
+          <th i18n>Price</th>
+          <th v>Quantity</th>
+          <th i18n>Action</th>
         </tr>
       </thead>
       <tbody>
@@ -25,7 +25,7 @@
           
           </td>
           <td>
-            <button (click)="removeFromCart(cartItem.id)" class="btn btn-danger">Remove</button>
+            <button (click)="removeFromCart(cartItem.id)" class="btn btn-danger"i18n>Remove</button>
           </td>
         </tr>
       </tbody>
@@ -33,6 +33,6 @@
   </div>
   
   <div *ngIf="!groupedCarts || groupedCarts.length === 0">
-    <p class="text-info">Your cart is empty.</p>
+    <p class="text-info"i18n>Your cart is empty.</p>
   </div>
 </div>
